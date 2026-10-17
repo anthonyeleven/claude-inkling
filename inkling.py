@@ -6,7 +6,8 @@ and refreshed in a detached child at most every REFRESH seconds so the status li
 never waits. Accounts without usage-based spend (or without a claude.ai login) just
 don't get the month segment.
 
-Pass --color to show the model, effort, session cost, and the two percentages in green.
+The model, effort, session cost, and the two percentages are shown in green; pass
+--no-color for plain text.
 
 Context drops of DROP_FRACTION or more in the same iTerm pane are shown as
 "was N" for SHOW_DROP seconds and appended to drops.log, tagged "same session"
@@ -28,7 +29,7 @@ REFRESH = 300
 STALE = 1800
 DROP_FRACTION = 0.2
 SHOW_DROP = 900
-COLOR = "--color" in sys.argv
+COLOR = "--no-color" not in sys.argv
 
 
 def save_spend(spend):
@@ -71,7 +72,7 @@ def maybe_spawn_refresh():
 
 
 def green(s):
-    """Wrap a value in ANSI green when --color is given."""
+    """Wrap a value in ANSI green unless --no-color is given."""
     return f"\033[32m{s}\033[0m" if COLOR else s
 
 

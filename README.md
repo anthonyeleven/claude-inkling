@@ -2,7 +2,7 @@
 
 A [Claude Code](https://code.claude.com/docs/en/overview) status line that gives you an inkling of what a session costs, how full its context is, and how much you've spent this month.
 
-![inkling under the Claude Code prompt, with --color](assets/example.png)
+![inkling under the Claude Code prompt](assets/example.png)
 
 It sits on the line under the Claude Code prompt and updates as you work. Cephalopods squirt ink when they want to slip away, and this one is meant to help you see when a session has gotten big enough to slip away from with `/compact` or `/clear`.
 
@@ -41,10 +41,10 @@ Claude Code picks the change up on its own; if a running session doesn't, restar
 
 ## Options
 
-- `--color` shows the model, effort, session cost, and the two percentages in green, as in the picture above:
+- `--no-color` turns off the green on the model, effort, session cost, and the two percentages, for plain text:
 
   ```json
-  "command": "python3 -I ~/git/claude-inkling/inkling.py --color"
+  "command": "python3 -I ~/git/claude-inkling/inkling.py --no-color"
   ```
 
 ## How the monthly figure works
