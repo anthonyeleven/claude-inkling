@@ -6,6 +6,9 @@ and refreshed in a detached child at most every REFRESH seconds so the status li
 never waits. Accounts without usage-based spend (or without a claude.ai login) just
 don't get the month segment.
 
+The model, effort, session cost, and the two percentages are shown in green; pass
+--no-color for plain text.
+
 Context drops of DROP_FRACTION or more in the same iTerm pane are shown as
 "was N" for SHOW_DROP seconds and appended to drops.log, tagged "same session"
 (/compact) or "new session" (/clear, resume, a fresh start).
@@ -26,6 +29,7 @@ REFRESH = 300
 STALE = 1800
 DROP_FRACTION = 0.2
 SHOW_DROP = 900
+COLOR = "--no-color" not in sys.argv
 
 
 def save_spend(spend):
@@ -67,6 +71,11 @@ def maybe_spawn_refresh():
     )
 
 
+def green(s):
+    """Wrap a value in ANSI green unless --no-color is given."""
+    return f"\033[32m{s}\033[0m" if COLOR else s
+
+
 def money(m, cents=False):
     v = m["amount_minor"] / 10 ** m.get("exponent", 2)
     return f"${v:,.2f}" if cents else f"${v:,.0f}"
@@ -91,7 +100,7 @@ def context_text(data):
         pct = round(100 * used / size)
     text = f"ctx {tokens(used)}"
     if size:
-        text += f" of {tokens(size)} ({pct}%)"
+        text += f" of {tokens(size)} ({green(f'{pct}%')})"
     was = track_drop(data.get("session_id"), used)
     if was:
         text += f", was {tokens(was)}"
@@ -155,7 +164,7 @@ def month_text():
         return None
     text = f"month {money(spend['used'])}"
     if spend.get("limit"):
-        text += f" of {money(spend['limit'])} ({spend.get('percent', 0)}%)"
+        text += f" of {money(spend['limit'])} ({green(str(spend.get('percent', 0)) + '%')})"
     if age > STALE:
         text += time.strftime(" (as of %-I:%M %p)", time.localtime(time.time() - age))
     return text
@@ -171,8 +180,8 @@ def main():
     except ValueError:
         data = {}
     session = (data.get("cost") or {}).get("total_cost_usd")
-    parts = [f"session ${session:,.2f}" if session is not None else "session …"]
-    model = " ".join(filter(None, [(data.get("model") or {}).get("display_name"),
+    parts = [f"session {green(f'${session:,.2f}')}" if session is not None else "session …"]
+    model = " ".join(green(s) for s in filter(None, [(data.get("model") or {}).get("display_name"),
                                    (data.get("effort") or {}).get("level")]))
     if model:
         parts.insert(0, model)
