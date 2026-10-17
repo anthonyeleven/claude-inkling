@@ -2,9 +2,7 @@
 
 A [Claude Code](https://code.claude.com/docs/en/overview) status line that gives you an inkling of what a session costs, how full its context is, and how much you've spent this month.
 
-```
-alice-42 · Opus 5.5 high · session $1.84 · ctx 117k of 1M (12%), was 312k · month $412 of $1,000 (41%)
-```
+![inkling under the Claude Code prompt, with --color](assets/example.png)
 
 It sits on the line under the Claude Code prompt and updates as you work. Cephalopods squirt ink when they want to slip away, and this one is meant to help you see when a session has gotten big enough to slip away from with `/compact` or `/clear`.
 
@@ -12,12 +10,12 @@ It sits on the line under the Claude Code prompt and updates as you work. Cephal
 
 | Segment | Meaning | Source |
 |---|---|---|
-| `alice-42` | The session's name, the one other local sessions see it by. Omitted if Claude Code hasn't named it. | `~/.claude/sessions/*.json` |
+| `vampire-22.2.0` | The session's name, the one other local sessions see it by. Omitted if Claude Code hasn't named it. | `~/.claude/sessions/*.json` |
 | `Opus 5.5 high` | Model and effort level. Follows `/model` and `/effort`. | Claude Code (stdin) |
-| `session $1.84` | This session's cost so far, as Claude Code computes it at list prices. | Claude Code (stdin) |
-| `ctx 117k of 1M (12%)` | Tokens sent with each request right now (system prompt, tools, memory, conversation) and the model's context window. | Claude Code (stdin) |
+| `session $4.72` | This session's cost so far, as Claude Code computes it at list prices. | Claude Code (stdin) |
+| `ctx 212k of 1M (21%)` | Tokens sent with each request right now (system prompt, tools, memory, conversation) and the model's context window. | Claude Code (stdin) |
 | `, was 312k` | Shown for 15 minutes after context drops by 20% or more in the same terminal pane, so you can see what `/compact`, `/clear`, or resuming a handoff bought you. | inkling |
-| `month $412 of $1,000 (41%)` | Your account's spend this month against its limit. Covers every machine and claude.ai, not just this one. Omitted for accounts without usage-based spend. | Anthropic usage endpoint |
+| `month $1,138 of $1,701 (67%)` | Your account's spend this month against its limit. Covers every machine and claude.ai, not just this one. Omitted for accounts without usage-based spend. | Anthropic usage endpoint |
 
 Every request resends the whole context, so the `ctx` number is a decent proxy for what each reply costs. A fresh session usually starts somewhere around 30-50k tokens (instructions, tool definitions, memory), which is the floor `/clear` can get you back to.
 
@@ -40,6 +38,14 @@ Then add this to `~/.claude/settings.json`, adjusting the path to `python3` if y
 ```
 
 Claude Code picks the change up on its own; if a running session doesn't, restart it.
+
+## Options
+
+- `--color` shows the model, effort, session cost, and the two percentages in green, as in the picture above:
+
+  ```json
+  "command": "python3 -I ~/git/claude-inkling/inkling.py --color"
+  ```
 
 ## How the monthly figure works
 
