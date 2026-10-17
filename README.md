@@ -1,4 +1,4 @@
-# inkling
+# claude-inkling
 
 A [Claude Code](https://code.claude.com/docs/en/overview) status line that gives you an inkling of what a session costs, how full its context is, and how much you've spent this month.
 
@@ -26,7 +26,7 @@ Every request resends the whole context, so the `ctx` number is a decent proxy f
 Requires macOS, Python 3.8+, and a recent Claude Code (one that passes `context_window` and `effort` to status line commands).
 
 ```bash
-git clone https://github.com/anthonyeleven/inkling.git ~/git/inkling
+git clone https://github.com/anthonyeleven/claude-inkling.git ~/git/claude-inkling
 ```
 
 Then add this to `~/.claude/settings.json`, adjusting the path to `python3` if yours lives elsewhere:
@@ -34,7 +34,7 @@ Then add this to `~/.claude/settings.json`, adjusting the path to `python3` if y
 ```json
 "statusLine": {
   "type": "command",
-  "command": "python3 -I ~/git/inkling/inkling.py",
+  "command": "python3 -I ~/git/claude-inkling/inkling.py",
   "padding": 0
 }
 ```
