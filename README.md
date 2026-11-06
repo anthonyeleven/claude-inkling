@@ -16,6 +16,7 @@ It sits on the line under the Claude Code prompt and updates as you work. Cephal
 | `ctx 212k of 1M (21%)` | Tokens sent with each request right now (system prompt, tools, memory, conversation) and the model's context window. | Claude Code (stdin) |
 | `, was 312k` | Shown for 15 minutes after context drops by 20% or more in the same terminal pane, so you can see what `/compact`, `/clear`, or resuming a handoff bought you. | inkling |
 | `month $1,138 of $1,701 (67%)` | Your account's spend this month against its limit. Covers every machine and claude.ai, not just this one. Omitted for accounts without usage-based spend. | Anthropic usage endpoint |
+| `, on pace for $1,800` | The month-end total if spending keeps its pace since the 1st (local time), to the nearest $100. Starts on the 2nd, since a few hours of use make a poor guess. | inkling |
 
 Every request resends the whole context, so the `ctx` number is a decent proxy for what each reply costs. A fresh session usually starts somewhere around 30-50k tokens (instructions, tool definitions, memory), which is the floor `/clear` can get you back to.
 

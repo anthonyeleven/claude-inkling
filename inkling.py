@@ -4,7 +4,8 @@ The session, model, and context figures come from Claude Code on stdin. The mont
 figure comes from Anthropic's usage endpoint (the one the desktop app uses), cached
 and refreshed in a detached child at most every REFRESH seconds so the status line
 never waits. Accounts without usage-based spend (or without a claude.ai login) just
-don't get the month segment.
+don't get the month segment. From the second day of the month on, it also shows the
+month-end total if spending keeps its pace since the 1st (local time).
 
 The model, effort, session cost, and the two percentages are shown in green; pass
 --no-color for plain text.
@@ -13,6 +14,7 @@ Context drops of DROP_FRACTION or more in the same iTerm pane are shown as
 "was N" for SHOW_DROP seconds and appended to drops.log, tagged "same session"
 (/compact) or "new session" (/clear, resume, a fresh start).
 """
+import calendar
 import json
 import os
 import re
@@ -29,6 +31,7 @@ REFRESH = 300
 STALE = 1800
 DROP_FRACTION = 0.2
 SHOW_DROP = 900
+PACE_AFTER = 86400
 COLOR = "--no-color" not in sys.argv
 
 
@@ -76,9 +79,23 @@ def green(s):
     return f"\033[32m{s}\033[0m" if COLOR else s
 
 
+def amount(m):
+    return m["amount_minor"] / 10 ** m.get("exponent", 2)
+
+
 def money(m, cents=False):
-    v = m["amount_minor"] / 10 ** m.get("exponent", 2)
+    v = amount(m)
     return f"${v:,.2f}" if cents else f"${v:,.0f}"
+
+
+def pace(used, at):
+    """Month-end spend if the rate since the 1st holds, or None during the month's first PACE_AFTER seconds."""
+    t = time.localtime(at)
+    start = time.mktime((t.tm_year, t.tm_mon, 1, 0, 0, 0, 0, 0, -1))
+    end = time.mktime((t.tm_year, t.tm_mon, calendar.monthrange(t.tm_year, t.tm_mon)[1] + 1, 0, 0, 0, 0, 0, -1))
+    if at - start < PACE_AFTER:
+        return None
+    return used * (end - start) / (at - start)
 
 
 def tokens(n):
@@ -165,6 +182,9 @@ def month_text():
     text = f"month {money(spend['used'])}"
     if spend.get("limit"):
         text += f" of {money(spend['limit'])} ({green(str(spend.get('percent', 0)) + '%')})"
+    projected = pace(amount(spend["used"]), time.time() - age)
+    if projected is not None:
+        text += f", on pace for ${round(projected, -2):,.0f}"
     if age > STALE:
         text += time.strftime(" (as of %-I:%M %p)", time.localtime(time.time() - age))
     return text
